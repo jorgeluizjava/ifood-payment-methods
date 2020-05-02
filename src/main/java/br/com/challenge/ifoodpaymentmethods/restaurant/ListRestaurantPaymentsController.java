@@ -1,6 +1,6 @@
 package br.com.challenge.ifoodpaymentmethods.restaurant;
 
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodsDTO;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodDTO;
 import br.com.challenge.ifoodpaymentmethods.shared.FindById;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,13 +18,13 @@ public class ListRestaurantPaymentsController {
     private RestaurantRepository restaurantRepository;
 
     @GetMapping("/api/restaurants/{id}/payment-methods")
-    public List<PaymentMethodsDTO> listPaymentsBy(@PathVariable("id") Long id) {
+    public List<PaymentMethodDTO> listPaymentsBy(@PathVariable("id") Long id) {
 
         Restaurant restaurant = FindById.executa(id, restaurantRepository);
 
         return restaurant.getPaymentMethods()
                 .stream()
-                .map(PaymentMethodsDTO::new)
+                .map(PaymentMethodDTO::new)
                 .collect(toList());
 
     }
