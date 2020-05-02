@@ -1,8 +1,6 @@
 package br.com.challenge.ifoodpaymentmethods;
 
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodRepository;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodType;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.*;
 import br.com.challenge.ifoodpaymentmethods.restaurant.Restaurant;
 import br.com.challenge.ifoodpaymentmethods.restaurant.RestaurantRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +25,9 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 	@Autowired
 	private PaymentMethodRepository paymentMethodRepository;
 
+	@Autowired
+	private BrandRepository brandRepository;
+
 	public static void main(String[] args) {
 		SpringApplication.run(IfoodPaymentMethodsApplication.class, args);
 	}
@@ -35,25 +36,51 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 	@Transactional
 	public void run(String... args) throws Exception {
 
-		List<PaymentMethod> allPaymentMethods = createPaymentMethods();
+		List<Brand> brands = createBrands();
 
+		List<PaymentMethod> allPaymentMethods = createPaymentMethods(brands);
 		createHabibs(allPaymentMethods);
 		createLuarVille(allPaymentMethods);
 		createParis6(allPaymentMethods);
 	}
 
-	private List<PaymentMethod> createPaymentMethods() {
+	private List<Brand> createBrands() {
+		List<Brand> brands = Arrays.asList(
+				new Brand("VISA"),
+				new Brand("MASTER CARD"),
+				new Brand("DINERS"),
+				new Brand("ELO"),
+				new Brand("AMEX"),
+				new Brand("CASH"),
+				new Brand("CHECK"),
+				new Brand("WALLET")
+		);
+		brandRepository.saveAll(brands);
+		return brands;
+	}
+
+	private List<PaymentMethod> createPaymentMethods(List<Brand> brands) {
+
+		Brand visa = brands.get(0);
+		Brand masterCard = brands.get(1);
+		Brand diners = brands.get(2);
+		Brand elo = brands.get(3);
+		Brand amex = brands.get(4);
+		Brand cash = brands.get(5);
+		Brand check = brands.get(6);
+		Brand wallet = brands.get(7);
+
 		List<PaymentMethod> paymentMethods = Arrays.asList(
-				new PaymentMethod("Visa", PaymentMethodType.CREDIT_CARD),
-				new PaymentMethod("Diners", PaymentMethodType.CREDIT_CARD),
-				new PaymentMethod("Master Card", PaymentMethodType.CREDIT_CARD),
-				new PaymentMethod("Elo", PaymentMethodType.CREDIT_CARD),
-				new PaymentMethod("Amex", PaymentMethodType.CREDIT_CARD),
-				new PaymentMethod( "Dinheiro", PaymentMethodType.CASH),
-				new PaymentMethod( "Crédito - Dinners", PaymentMethodType.POS_MACHINE),
-				new PaymentMethod( "Crédito - Elo", PaymentMethodType.POS_MACHINE),
-				new PaymentMethod( "Débito - Dinners", PaymentMethodType.POS_MACHINE),
-				new PaymentMethod( "Débito - Elo", PaymentMethodType.POS_MACHINE)
+				new PaymentMethod("Visa", PaymentMethodType.CREDIT_CARD, visa),
+				new PaymentMethod("Diners", PaymentMethodType.CREDIT_CARD, diners),
+				new PaymentMethod("Master Card", PaymentMethodType.CREDIT_CARD, masterCard),
+				new PaymentMethod("Elo", PaymentMethodType.CREDIT_CARD, elo),
+				new PaymentMethod("Amex", PaymentMethodType.CREDIT_CARD, amex),
+				new PaymentMethod( "Dinheiro", PaymentMethodType.CASH, cash),
+				new PaymentMethod( "Crédito - Diners", PaymentMethodType.POS_MACHINE, diners),
+				new PaymentMethod( "Crédito - Elo", PaymentMethodType.POS_MACHINE, elo),
+				new PaymentMethod( "Débito - Diners", PaymentMethodType.POS_MACHINE, diners),
+				new PaymentMethod( "Débito - Elo", PaymentMethodType.POS_MACHINE, elo)
 		);
 		paymentMethodRepository.saveAll(paymentMethods);
 
@@ -92,6 +119,6 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 		Restaurant restaurant = new Restaurant("PARIS 6", paymentMethods);
 		restaurantRepository.save(restaurant);
-
 	}
+
 }
