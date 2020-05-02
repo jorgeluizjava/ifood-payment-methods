@@ -2,17 +2,15 @@ package br.com.challenge.ifoodpaymentmethods.paymentmethods;
 
 import org.springframework.util.Assert;
 
-public class PaymentMethodsDTO {
+public class PaymentMethodDTO {
 
     private Long paymentMethodId;
     private String description;
-    private PaymentMethodType paymentMethodType;
 
-    public PaymentMethodsDTO(PaymentMethod paymentMethod) {
+    public PaymentMethodDTO(PaymentMethod paymentMethod) {
         Assert.notNull(paymentMethod, "paymentMethod cannot be null");
         this.paymentMethodId = paymentMethod.getId();
         this.description = paymentMethod.getDescription();
-        this.paymentMethodType = paymentMethod.getPaymentMethodType();
     }
 
     public Long getPaymentMethodId() {
@@ -23,9 +21,6 @@ public class PaymentMethodsDTO {
         return description;
     }
 
-    public PaymentMethodType getPaymentMethodType() {
-        return paymentMethodType;
-    }
 
     @Override
     public String toString() {
