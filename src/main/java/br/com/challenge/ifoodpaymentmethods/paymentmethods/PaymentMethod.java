@@ -3,6 +3,7 @@ package br.com.challenge.ifoodpaymentmethods.paymentmethods;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Objects;
 
@@ -15,7 +16,12 @@ public class PaymentMethod {
     private Long id;
 
     @NotNull
+    @Column(nullable = false, unique = true)
     private String description;
+
+    @NotNull
+    @ManyToOne
+    private Brand brand;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -25,13 +31,15 @@ public class PaymentMethod {
     PaymentMethod() {
     }
 
-    public PaymentMethod(String description, PaymentMethodType paymentMethodType) {
+    public PaymentMethod(@NotBlank String description, @NotNull PaymentMethodType paymentMethodType, @NotNull Brand brand) {
 
         Assert.hasText(description, "description is required");
         Assert.notNull(paymentMethodType, "paymentMethodType is required");
+        Assert.notNull(brand, "brand is required");
 
         this.description = description;
         this.paymentMethodType = paymentMethodType;
+        this.brand = brand;
     }
 
     public Long getId() {
@@ -42,17 +50,12 @@ public class PaymentMethod {
         return description;
     }
 
-    public PaymentMethodType getPaymentMethodType() {
-        return paymentMethodType;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         PaymentMethod that = (PaymentMethod) o;
-        return Objects.equals(id, that.id) &&
-                description.equals(that.description) &&
+        return description.equals(that.description) &&
                 paymentMethodType == that.paymentMethodType;
     }
 
