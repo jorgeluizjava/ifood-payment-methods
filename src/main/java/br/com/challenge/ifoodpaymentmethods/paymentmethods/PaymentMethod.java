@@ -56,11 +56,12 @@ public class PaymentMethod {
         if (o == null || getClass() != o.getClass()) return false;
         PaymentMethod that = (PaymentMethod) o;
         return description.equals(that.description) &&
+                brand.equals(that.brand) &&
                 paymentMethodType == that.paymentMethodType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(description, paymentMethodType);
+        return Objects.hash(description, brand, paymentMethodType);
     }
 }
