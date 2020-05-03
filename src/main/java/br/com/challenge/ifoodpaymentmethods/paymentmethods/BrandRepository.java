@@ -1,5 +1,9 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods;
 
-public interface BrandRepository extends BasicBrandRepository<Brand, Long> {
+import org.springframework.data.repository.Repository;
+
+public interface BrandRepository extends Repository<Brand, Long> {
+
+    Iterable<Brand> saveAll(Iterable<Brand> var1);
 
 }
