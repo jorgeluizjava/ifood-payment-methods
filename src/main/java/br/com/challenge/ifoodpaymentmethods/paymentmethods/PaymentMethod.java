@@ -20,10 +20,6 @@ public class PaymentMethod {
     private String description;
 
     @NotNull
-    @ManyToOne
-    private Brand brand;
-
-    @NotNull
     @Enumerated(EnumType.STRING)
     private PaymentMethodType paymentMethodType;
 
@@ -31,15 +27,13 @@ public class PaymentMethod {
     PaymentMethod() {
     }
 
-    public PaymentMethod(@NotBlank String description, @NotNull PaymentMethodType paymentMethodType, @NotNull Brand brand) {
+    public PaymentMethod(@NotBlank String description, @NotNull PaymentMethodType paymentMethodType) {
 
         Assert.hasText(description, "description is required");
         Assert.notNull(paymentMethodType, "paymentMethodType is required");
-        Assert.notNull(brand, "brand is required");
 
         this.description = description;
         this.paymentMethodType = paymentMethodType;
-        this.brand = brand;
     }
 
     public Long getId() {
@@ -56,12 +50,11 @@ public class PaymentMethod {
         if (o == null || getClass() != o.getClass()) return false;
         PaymentMethod that = (PaymentMethod) o;
         return description.equals(that.description) &&
-                brand.equals(that.brand) &&
                 paymentMethodType == that.paymentMethodType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(description, brand, paymentMethodType);
+        return Objects.hash(description, paymentMethodType);
     }
 }
