@@ -5,6 +5,8 @@ import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodReposito
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodType;
 import br.com.challenge.ifoodpaymentmethods.restaurant.Restaurant;
 import br.com.challenge.ifoodpaymentmethods.restaurant.RestaurantRepository;
+import br.com.challenge.ifoodpaymentmethods.user.User;
+import br.com.challenge.ifoodpaymentmethods.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -27,6 +29,9 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 	@Autowired
 	private PaymentMethodRepository paymentMethodRepository;
 
+	@Autowired
+	private UserRepository userRepository;
+
 	public static void main(String[] args) {
 		SpringApplication.run(IfoodPaymentMethodsApplication.class, args);
 	}
@@ -39,8 +44,29 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		createHabibs(allPaymentMethods);
 		createLuarVille(allPaymentMethods);
 		createParis6(allPaymentMethods);
+
+		criaUsuario1(allPaymentMethods);
+		criaUsuario2(allPaymentMethods);
 	}
 
+	private void criaUsuario1(List<PaymentMethod> allPaymentMethods) {
+
+		Set<PaymentMethod> desiredPaymentMethods = new HashSet<>(allPaymentMethods);
+
+		User user = new User("usuario1@email.com.br", desiredPaymentMethods);
+		userRepository.save(user);
+	}
+
+	private void criaUsuario2(List<PaymentMethod> allPaymentMethods) {
+
+		Set<PaymentMethod> desiredPaymentMethods = new HashSet<>();
+		desiredPaymentMethods.add(allPaymentMethods.get(0));
+		desiredPaymentMethods.add(allPaymentMethods.get(2));
+		desiredPaymentMethods.add(allPaymentMethods.get(3));
+
+		User user = new User("usuario2@email.com.br", desiredPaymentMethods);
+		userRepository.save(user);
+	}
 
 	private void createHabibs(List<PaymentMethod> allPaymentMethods) {
 
