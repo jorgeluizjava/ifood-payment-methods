@@ -43,7 +43,7 @@ public class User {
         this.desiredPaymentMethods = desiredPaymentMethods;
     }
 
-    public Set<PaymentMethod> getDesiredPaymentMethods() {
-        return Collections.unmodifiableSet(desiredPaymentMethods);
+    public boolean accept(PaymentMethod paymentMethod) {
+        return desiredPaymentMethods.contains(paymentMethod);
     }
 }

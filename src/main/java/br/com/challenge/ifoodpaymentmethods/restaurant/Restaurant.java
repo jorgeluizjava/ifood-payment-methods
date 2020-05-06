@@ -50,7 +50,7 @@ public class Restaurant {
         Assert.notNull(user, "user must not be null");
         return this.paymentMethods
                     .stream()
-                        .filter(paymentMethod -> user.getDesiredPaymentMethods().contains(paymentMethod))
+                        .filter(paymentMethod -> user.accept(paymentMethod))
                     .collect(Collectors.toSet());
     }
 }
