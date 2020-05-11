@@ -1,5 +1,6 @@
 package br.com.challenge.ifoodpaymentmethods.restaurant;
 
+import br.com.challenge.ifoodpaymentmethods.shared.fraudster.FraudsterCheck;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
 import br.com.challenge.ifoodpaymentmethods.user.User;
 import org.springframework.util.Assert;
@@ -7,9 +8,8 @@ import org.springframework.util.Assert;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import javax.validation.constraints.Size;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
@@ -42,12 +42,17 @@ public class Restaurant {
         this.paymentMethods = paymentMethods;
     }
 
-    public Set<PaymentMethod> getPaymentMethods() {
-        return Collections.unmodifiableSet(paymentMethods);
-    }
+    public Set<PaymentMethod> filterDesiredPaymentMethods(@NotNull User user, @NotNull @Size(min = 1) List<FraudsterCheck> checkFraudsters) {
 
-    public Set<PaymentMethod> filterDesiredPaymentMethods(User user) {
         Assert.notNull(user, "user must not be null");
+        Assert.notNull(checkFraudsters, "checkFraudsters must not be null");
+        Assert.isTrue(!checkFraudsters.isEmpty(), "checkFraudsters must not be empty");
+
+        boolean isFraudster = checkFraudsters.stream().anyMatch(fraudsterCheck -> fraudsterCheck.check(user));
+        if (isFraudster) {
+            return paymentMethods.stream().filter(paymentMethod -> !paymentMethod.isOnline()).collect(Collectors.toSet());
+        }
+
         return this.paymentMethods
                     .stream()
                         .filter(paymentMethod -> user.accept(paymentMethod))

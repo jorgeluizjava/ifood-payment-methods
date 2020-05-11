@@ -47,13 +47,14 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 		criaUsuario1(allPaymentMethods);
 		criaUsuario2(allPaymentMethods);
+		criaUsuario3(allPaymentMethods);
 	}
 
 	private void criaUsuario1(List<PaymentMethod> allPaymentMethods) {
 
 		Set<PaymentMethod> desiredPaymentMethods = new HashSet<>(allPaymentMethods);
 
-		User user = new User("usuario1@email.com.br", desiredPaymentMethods);
+		User user = new User("usuario1@email.com.br", "Joao", desiredPaymentMethods);
 		userRepository.save(user);
 	}
 
@@ -64,7 +65,15 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		desiredPaymentMethods.add(allPaymentMethods.get(2));
 		desiredPaymentMethods.add(allPaymentMethods.get(3));
 
-		User user = new User("usuario2@email.com.br", desiredPaymentMethods);
+		User user = new User("usuario2@email.com.br", "Caio", desiredPaymentMethods);
+		userRepository.save(user);
+	}
+
+	private void criaUsuario3(List<PaymentMethod> allPaymentMethods) {
+
+		Set<PaymentMethod> desiredPaymentMethods = new HashSet<>(allPaymentMethods);
+
+		User user = new User("usuario3@email.com.br", "Adr", desiredPaymentMethods);
 		userRepository.save(user);
 	}
 

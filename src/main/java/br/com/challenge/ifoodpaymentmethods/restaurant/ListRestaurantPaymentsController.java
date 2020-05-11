@@ -2,6 +2,7 @@ package br.com.challenge.ifoodpaymentmethods.restaurant;
 
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodDTO;
 import br.com.challenge.ifoodpaymentmethods.shared.FindById;
+import br.com.challenge.ifoodpaymentmethods.shared.fraudster.FraudsterCheck;
 import br.com.challenge.ifoodpaymentmethods.user.User;
 import br.com.challenge.ifoodpaymentmethods.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class ListRestaurantPaymentsController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private List<FraudsterCheck> fraudsterChecks;
+
     @GetMapping("/api/restaurants/{id}/payment-methods")
     public List<PaymentMethodDTO> listPaymentsBy(@PathVariable("id") Long id) {
 
@@ -29,7 +33,7 @@ public class ListRestaurantPaymentsController {
 
         User user = getUser2();
 
-        return restaurant.filterDesiredPaymentMethods(user)
+        return restaurant.filterDesiredPaymentMethods(user, fraudsterChecks)
                                 .stream()
                                 .map(PaymentMethodDTO::new)
                                 .collect(toList());
@@ -37,6 +41,6 @@ public class ListRestaurantPaymentsController {
     }
 
     private User getUser2() {
-        return userRepository.findByLogin("usuario2@email.com.br").get();
+        return userRepository.findByLogin("usuario3@email.com.br").get();
     }
 }
