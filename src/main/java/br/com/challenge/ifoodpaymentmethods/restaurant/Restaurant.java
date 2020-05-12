@@ -1,15 +1,15 @@
 package br.com.challenge.ifoodpaymentmethods.restaurant;
 
-import br.com.challenge.ifoodpaymentmethods.shared.fraudster.FraudsterCheck;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
+import br.com.challenge.ifoodpaymentmethods.shared.fraudster.PaymentMethodFraudsterVerifier;
 import br.com.challenge.ifoodpaymentmethods.user.User;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -42,20 +42,17 @@ public class Restaurant {
         this.paymentMethods = paymentMethods;
     }
 
-    public Set<PaymentMethod> filterDesiredPaymentMethods(@NotNull User user, @NotNull @Size(min = 1) List<FraudsterCheck> checkFraudsters) {
+    public Set<PaymentMethod> filterDesiredPaymentMethods(@NotNull User user, PaymentMethodFraudsterVerifier paymentMethodFraudsterVerifier) {
 
         Assert.notNull(user, "user must not be null");
-        Assert.notNull(checkFraudsters, "checkFraudsters must not be null");
-        Assert.isTrue(!checkFraudsters.isEmpty(), "checkFraudsters must not be empty");
+        Assert.notNull(paymentMethodFraudsterVerifier, "PaymentMethodFraudsterVerifier must not be null");
 
-        boolean isFraudster = checkFraudsters.stream().anyMatch(fraudsterCheck -> fraudsterCheck.check(user));
-        if (isFraudster) {
-            return paymentMethods.stream().filter(paymentMethod -> !paymentMethod.isOnline()).collect(Collectors.toSet());
-        }
+        Set<PaymentMethod> paymentMethods = this.paymentMethods
+                .stream()
+                .filter(paymentMethod -> user.accept(paymentMethod))
+                .filter(paymentMethod -> paymentMethodFraudsterVerifier.verify(user, paymentMethod))
+                .collect(Collectors.toSet());
 
-        return this.paymentMethods
-                    .stream()
-                        .filter(paymentMethod -> user.accept(paymentMethod))
-                    .collect(Collectors.toSet());
+        return paymentMethods;
     }
 }

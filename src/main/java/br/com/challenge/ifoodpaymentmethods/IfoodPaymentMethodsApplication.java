@@ -92,11 +92,12 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 				new PaymentMethod("Master Card", PaymentMethodType.CREDIT_CARD),
 				new PaymentMethod("Elo", PaymentMethodType.CREDIT_CARD),
 				new PaymentMethod("Amex", PaymentMethodType.CREDIT_CARD),
+				new PaymentMethod("Apple Pay", PaymentMethodType.DIGITAL_WALLET),
 				new PaymentMethod( "Dinheiro", PaymentMethodType.CASH),
-				new PaymentMethod( "Crédito - Diners", PaymentMethodType.POS_MACHINE),
-				new PaymentMethod( "Crédito - Elo", PaymentMethodType.POS_MACHINE),
-				new PaymentMethod( "Débito - Diners", PaymentMethodType.POS_MACHINE),
-				new PaymentMethod( "Débito - Elo", PaymentMethodType.POS_MACHINE)
+				new PaymentMethod( "Crédito - Diners (Maquininha)", PaymentMethodType.POS_MACHINE),
+				new PaymentMethod( "Crédito - Elo (Maquininha)", PaymentMethodType.POS_MACHINE),
+				new PaymentMethod( "Débito - Diners (Maquininha)", PaymentMethodType.POS_MACHINE),
+				new PaymentMethod( "Débito - Elo (Maquininha)", PaymentMethodType.POS_MACHINE)
 		);
 		paymentMethodRepository.saveAll(paymentMethods);
 
