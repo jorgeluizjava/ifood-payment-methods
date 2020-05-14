@@ -24,6 +24,10 @@ public class User {
     @Column(unique = true)
     private String login;
 
+    @NotBlank
+    @Column(nullable = false)
+    private String name;
+
     @ManyToMany
     @JoinTable(
             name = "user_desired_payment_methods",
@@ -36,11 +40,17 @@ public class User {
     User() {
     }
 
-    public User(@NotBlank @Email String login, @NotEmpty Set<PaymentMethod> desiredPaymentMethods) {
+    public User(@NotBlank @Email String login, String name, @NotEmpty Set<PaymentMethod> desiredPaymentMethods) {
         Assert.hasText(login, "login is required");
+        Assert.hasText(name, "name is required");
         Assert.notEmpty(desiredPaymentMethods, "desiredPaymentMethods is required");
         this.login = login;
+        this.name = name;
         this.desiredPaymentMethods = desiredPaymentMethods;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public boolean accept(PaymentMethod paymentMethod) {

@@ -44,6 +44,10 @@ public class PaymentMethod {
         return description;
     }
 
+    public boolean isOnline() {
+        return paymentMethodType.isOnline();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
