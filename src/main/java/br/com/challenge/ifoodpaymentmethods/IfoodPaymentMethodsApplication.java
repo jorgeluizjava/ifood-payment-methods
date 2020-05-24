@@ -1,9 +1,9 @@
 package br.com.challenge.ifoodpaymentmethods;
 
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.Brand;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodRepository;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodType;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.creditcard.Brand;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.PaymentMethodProvider;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.PaymentMethodProviderRepository;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.PaymentMethodProviderType;
@@ -16,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -145,7 +147,6 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		restaurantRepository.save(restaurant);
 	}
 
-
 	private List<Brand> allBrands() {
 		List<Brand> allBrands = new ArrayList<>();
 		allBrands.add(Brand.MASTER_CARD);
@@ -166,9 +167,10 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 		BigDecimal taxAmount = new BigDecimal(2);
 
-		String comunicationUrl = "https://subacquirerA/process";
+		String comunicationUrl = "http://localhost:8081/api/fakeproviders/subacquirera";
+		String providerClassIdentification = "SUBACQUIRERA";
 
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerA", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl);
+		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerA", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
 		paymentMethodProviderRepository.save(paymentMethodProvider);
 	}
 
@@ -181,9 +183,10 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 		BigDecimal taxAmount = new BigDecimal(3);
 
-		String comunicationUrl = "https://subacquirerB/process";
+		String comunicationUrl = "http://localhost:8081/api/fakeproviders/subacquirerb";
+		String providerClassIdentification = "SUBACQUIRERB";
 
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerB", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl);
+		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerB", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
 		paymentMethodProviderRepository.save(paymentMethodProvider);
 	}
 
@@ -196,9 +199,10 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 		BigDecimal taxAmount = new BigDecimal(5);
 
-		String comunicationUrl = "https://subacquirerC/process";
+		String comunicationUrl = "http://localhost:8081/api/fakeproviders/subacquirerc";
+		String providerClassIdentification = "SUBACQUIRERC";
 
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerC", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl);
+		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerC", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
 		paymentMethodProviderRepository.save(paymentMethodProvider);
 	}
 
@@ -212,9 +216,10 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 		BigDecimal taxAmount = new BigDecimal(1);
 
-		String comunicationUrl = "https://gatewayD/process";
+		String comunicationUrl = "http://localhost:8081/api/fakeproviders/gatewayd";
+		String providerClassIdentification = "GATEWAYD";
 
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("GatewayD", taxAmount, PaymentMethodProviderType.GATEWAY, acceptedBrands, acceptedCountries, comunicationUrl);
+		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("GatewayD", taxAmount, PaymentMethodProviderType.GATEWAY, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
 		paymentMethodProviderRepository.save(paymentMethodProvider);
 	}
 
@@ -227,10 +232,16 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 		BigDecimal taxAmount = new BigDecimal(3);
 
-		String comunicationUrl = "https://gatewayE/process";
+		String comunicationUrl = "http://localhost:8081/api/fakeproviders/gatewaye";
+		String providerClassIdentification = "GATEWAYE";
 
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("GatewayE", taxAmount, PaymentMethodProviderType.GATEWAY, acceptedBrands, acceptedCountries, comunicationUrl);
+		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("GatewayE", taxAmount, PaymentMethodProviderType.GATEWAY, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
 		paymentMethodProviderRepository.save(paymentMethodProvider);
 	}
 
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
 }

@@ -53,6 +53,10 @@ public class User {
         return name;
     }
 
+    public String getLogin() {
+        return login;
+    }
+
     public boolean accept(PaymentMethod paymentMethod) {
         return desiredPaymentMethods.contains(paymentMethod);
     }

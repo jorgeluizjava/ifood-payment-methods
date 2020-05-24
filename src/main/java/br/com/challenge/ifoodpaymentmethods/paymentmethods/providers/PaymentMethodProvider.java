@@ -1,6 +1,8 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.providers;
 
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.Brand;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.Payment;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.ProcessPayment;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.creditcard.Brand;
 import br.com.challenge.ifoodpaymentmethods.shared.CountryCode;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.util.Assert;
@@ -12,6 +14,8 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -44,9 +48,12 @@ public class PaymentMethodProvider {
     @Enumerated(EnumType.STRING)
     private Set<CountryCode> acceptedCountries = new HashSet<>();
 
-    @NotNull
+    @NotBlank
     @URL
     private String comunicationUrl;
+
+    @NotBlank
+    private String providerClassIdentification;
 
     @Deprecated
     PaymentMethodProvider(){}
@@ -57,7 +64,8 @@ public class PaymentMethodProvider {
                     @NotNull PaymentMethodProviderType paymentMethodProviderType,
                     @NotNull @NotEmpty Set<Brand> acceptedBrands,
                     @NotNull @NotEmpty Set<CountryCode> acceptedCountries,
-                    @NotNull @URL String comunicationUrl) {
+                    @NotBlank @URL String comunicationUrl,
+                    @NotBlank String providerClassIdentification) {
 
 
         Assert.hasText(description, "description is required");
@@ -74,6 +82,7 @@ public class PaymentMethodProvider {
         }
 
         Assert.hasText(comunicationUrl, "comunicationUrl is required");
+        Assert.hasText(providerClassIdentification, "providerClassIdentification is required");
 
         this.description = description;
         this.paymentMethodProviderType = paymentMethodProviderType;
@@ -81,6 +90,7 @@ public class PaymentMethodProvider {
         this.acceptedBrands.addAll(acceptedBrands);
         this.acceptedCountries.addAll(acceptedCountries);
         this.comunicationUrl = comunicationUrl;
+        this.providerClassIdentification = providerClassIdentification;
     }
 
     public boolean accept(CountryCode countryCode) {
@@ -99,7 +109,25 @@ public class PaymentMethodProvider {
         return comunicationUrl;
     }
 
+    public String getProviderClassIdentification() {
+        return providerClassIdentification;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public ProcessPayment getProcessPayment(List<ProcessPayment> processPayments) {
+
+        Optional<ProcessPayment> optionalProcessPayment = processPayments
+                .stream()
+                .filter(processPayment -> processPayment.getType().toLowerCase().equals(providerClassIdentification.toLowerCase()))
+                .findFirst();
+
+        if (!optionalProcessPayment.isPresent()) {
+            throw new IllegalArgumentException("Invalid ProcessPayment");
+        }
+
+        return optionalProcessPayment.get();
     }
 }
