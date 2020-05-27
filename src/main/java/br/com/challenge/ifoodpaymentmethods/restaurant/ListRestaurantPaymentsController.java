@@ -33,10 +33,11 @@ public class ListRestaurantPaymentsController {
 
         User user = getUser2();
 
-        return restaurant.filterDesiredPaymentMethods(user, paymentMethodFraudsterVerifier)
-                                .stream()
-                                .map(PaymentMethodDTO::new)
-                                .collect(toList());
+        return user
+                .filterDesiredPaymentMethods(restaurant, paymentMethodFraudsterVerifier)
+                .stream()
+                .map(PaymentMethodDTO::new)
+                .collect(toList());
 
     }
 

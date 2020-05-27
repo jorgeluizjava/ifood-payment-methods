@@ -149,7 +149,7 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 	private List<Brand> allBrands() {
 		List<Brand> allBrands = new ArrayList<>();
-		allBrands.add(Brand.MASTER_CARD);
+		allBrands.add(Brand.MASTERCARD);
 		allBrands.add(Brand.VISA);
 		allBrands.add(Brand.AMEX);
 		allBrands.add(Brand.DINERS);

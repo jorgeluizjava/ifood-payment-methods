@@ -2,7 +2,7 @@ package br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.credi
 
 public enum Brand {
     VISA,
-    MASTER_CARD,
+    MASTERCARD,
     DINERS,
     ELO,
     HIPERCARD,
