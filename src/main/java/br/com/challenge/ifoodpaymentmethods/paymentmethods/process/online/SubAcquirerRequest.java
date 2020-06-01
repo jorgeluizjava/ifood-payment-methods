@@ -1,10 +1,7 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online;
 
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.Payment;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.creditcard.CreditCardInformation;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.PaymentRequest;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.creditcard.SubAcquirerCreditCard;
-import br.com.challenge.ifoodpaymentmethods.user.User;
 import org.springframework.util.Assert;
 
 import javax.validation.constraints.Min;
@@ -34,21 +31,17 @@ public class SubAcquirerRequest {
     public SubAcquirerRequest() {
     }
 
-    public SubAcquirerRequest(Payment payment) {
+    public SubAcquirerRequest(PaymentRequest paymentRequest) {
 
-        Assert.notNull(payment, "payment is required");
+        Assert.notNull(paymentRequest, "payment is required");
 
-        User user = payment.getUser();
-        PaymentMethod paymentMethod = payment.getPaymentMethod();
-        CreditCardInformation creditCardInformation = payment.getCreditCardInformation();
-
-        this.orderId = payment.getOrderId().toString();
-        this.customerName = user.getName();
-        this.customerEmail = user.getLogin();
-        this.paymentType = paymentMethod.getPaymentMethodType().name();
-        this.amount = payment.getAmount();
+        this.orderId = paymentRequest.getOrderId().toString();
+        this.customerName = paymentRequest.getUser().getName();
+        this.customerEmail = paymentRequest.getUser().getLogin();
+        this.paymentType = paymentRequest.getPaymentMethod().getPaymentMethodTypeName();
+        this.amount = paymentRequest.getAmount();
         this.installments = 0;
-        this.creditCard = new SubAcquirerCreditCard(creditCardInformation);
+        this.creditCard = new SubAcquirerCreditCard(paymentRequest.getCreditCardInformation());
     }
 
     public String getOrderId() {

@@ -1,5 +1,7 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online;
 
+import org.springframework.util.Assert;
+
 public class GatewayResponse {
 
     private String orderId;
@@ -19,5 +21,10 @@ public class GatewayResponse {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isAccepted(String value) {
+        Assert.hasText(value, "value is required");
+        return status.equalsIgnoreCase(value);
     }
 }

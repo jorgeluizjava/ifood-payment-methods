@@ -1,7 +1,7 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online;
 
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.Payment;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.PaymentRequest;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.creditcard.CreditCardInformation;
 import br.com.challenge.ifoodpaymentmethods.user.User;
 import org.springframework.util.Assert;
@@ -40,19 +40,19 @@ public class GatewayRequest {
     @Deprecated
     public GatewayRequest() {}
 
-    public GatewayRequest(Payment payment) {
+    public GatewayRequest(PaymentRequest paymentRequest) {
 
-        Assert.notNull(payment, "payment is required");
+        Assert.notNull(paymentRequest, "paymentRequest is required");
 
-        User user = payment.getUser();
-        PaymentMethod paymentMethod = payment.getPaymentMethod();
-        CreditCardInformation creditCardInformation = payment.getCreditCardInformation();
+        User user = paymentRequest.getUser();
+        PaymentMethod paymentMethod = paymentRequest.getPaymentMethod();
+        CreditCardInformation creditCardInformation = paymentRequest.getCreditCardInformation();
 
-        this.orderId = payment.getOrderId().toString();
+        this.orderId = paymentRequest.getOrderId().toString();
         this.customerName = user.getName();
         this.customerEmail = user.getLogin();
-        this.paymentType = paymentMethod.getPaymentMethodType().name();
-        this.amount = payment.getAmount();
+        this.paymentType = paymentMethod.getPaymentMethodTypeName();
+        this.amount = paymentRequest.getAmount();
         this.cardNumber = creditCardInformation.getCardNumber();
         this.holder = creditCardInformation.getNameOnCard();
         this.month = creditCardInformation.getExpirationDate().getMonth().toString();

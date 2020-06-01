@@ -1,9 +1,6 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.process;
 
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.ProcessPayment;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.ProcessPaymentResponse;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.creditcard.CreditCardInformation;
 import br.com.challenge.ifoodpaymentmethods.restaurant.Restaurant;
 import br.com.challenge.ifoodpaymentmethods.user.User;
 import org.springframework.util.Assert;
@@ -46,9 +43,6 @@ public class Payment {
 
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Embedded
-    private CreditCardInformation creditCardInformation;
-
     @Deprecated
     Payment() {}
 
@@ -75,21 +69,6 @@ public class Payment {
         this.paymentMethod = paymentMethod;
         this.paymentStatus = paymentStatus;
         this.amount = amount;
-    }
-
-    public Payment(
-            @NotNull Long orderId,
-            @NotNull Restaurant restaurant,
-            @NotNull User user,
-            @NotNull PaymentMethod paymentMethod,
-            @NotNull PaymentStatus paymentStatus,
-            @Min(value = 1) BigDecimal amount,
-            CreditCardInformation creditCardInformation) {
-
-        this(orderId, restaurant, user, paymentMethod, paymentStatus, amount);
-
-        Assert.notNull(creditCardInformation, "creditCardInformation is required");
-        this.creditCardInformation = creditCardInformation;
     }
 
     public Long getId() {
@@ -124,32 +103,4 @@ public class Payment {
         return createdAt;
     }
 
-    public CreditCardInformation getCreditCardInformation() {
-        return creditCardInformation;
-    }
-
-    public void finished() {
-        this.paymentStatus = PaymentStatus.FINISHED;
-    }
-
-    public void register(ProcessPaymentResponse processPaymentResponse) {
-        Assert.notNull(processPaymentResponse, "processPaymentResponse");
-
-        boolean isSuccessed = processPaymentResponse.isSuccessed();
-        if (!isSuccessed) {
-            this.paymentStatus = PaymentStatus.FAILED;
-            return;
-        }
-
-        if (!isFinished()) {
-            this.paymentStatus = PaymentStatus.FINISHED;
-            return;
-        }
-
-        throw new IllegalStateException("payment has already been taken");
-    }
-
-    private boolean isFinished() {
-        return this.paymentStatus.equals(PaymentStatus.FINISHED);
-    }
 }

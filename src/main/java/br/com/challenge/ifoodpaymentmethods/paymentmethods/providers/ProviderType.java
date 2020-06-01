@@ -1,7 +1,8 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.providers;
 
-public enum PaymentMethodProviderCostOrder {
+public enum ProviderType {
 
-    CHEAP,
-    EXPENSIVE;
+    GATEWAY,
+    ACQUIRER,
+    SUB_ACQUIRER;
 }

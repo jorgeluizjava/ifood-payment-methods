@@ -4,9 +4,7 @@ import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodRepository;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodType;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.creditcard.Brand;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.PaymentMethodProvider;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.PaymentMethodProviderRepository;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.PaymentMethodProviderType;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.ProviderConfiguration;
 import br.com.challenge.ifoodpaymentmethods.restaurant.Restaurant;
 import br.com.challenge.ifoodpaymentmethods.restaurant.RestaurantRepository;
 import br.com.challenge.ifoodpaymentmethods.shared.CountryCode;
@@ -21,7 +19,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 
 @SpringBootApplication
@@ -37,8 +36,8 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
-	private PaymentMethodProviderRepository paymentMethodProviderRepository;
+	@PersistenceContext
+	private EntityManager manager;
 
 	public static void main(String[] args) {
 		SpringApplication.run(IfoodPaymentMethodsApplication.class, args);
@@ -56,14 +55,6 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		criaUsuario1(allPaymentMethods);
 		criaUsuario2(allPaymentMethods);
 		criaUsuario3(allPaymentMethods);
-
-		List<Brand> allBrands = allBrands();
-
-		criaPaymentProviderSubAcquierA(allBrands);
-		criaPaymentProviderSubAcquierB(allBrands);
-		criaPaymentProviderSubAcquierC(allBrands);
-		criaPaymentProviderGatewayD(allBrands);
-		criaPaymentProviderGatewayE(allBrands);
 	}
 
 	private void criaUsuario1(List<PaymentMethod> allPaymentMethods) {
@@ -165,13 +156,8 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		Set<CountryCode> acceptedCountries = new HashSet<>();
 		acceptedCountries.add(CountryCode.MX);
 
-		BigDecimal taxAmount = new BigDecimal(2);
-
-		String comunicationUrl = "http://localhost:8081/api/fakeproviders/subacquirera";
-		String providerClassIdentification = "SUBACQUIRERA";
-
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerA", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
-		paymentMethodProviderRepository.save(paymentMethodProvider);
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for subacquire a", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
 	}
 
 	private void criaPaymentProviderSubAcquierB(List<Brand> allBrands) {
@@ -181,13 +167,8 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		Set<CountryCode> acceptedCountries = new HashSet<>();
 		acceptedCountries.add(CountryCode.MX);
 
-		BigDecimal taxAmount = new BigDecimal(3);
-
-		String comunicationUrl = "http://localhost:8081/api/fakeproviders/subacquirerb";
-		String providerClassIdentification = "SUBACQUIRERB";
-
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerB", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
-		paymentMethodProviderRepository.save(paymentMethodProvider);
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for subacquire b", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
 	}
 
 	private void criaPaymentProviderSubAcquierC(List<Brand> allBrands) {
@@ -197,13 +178,8 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		Set<CountryCode> acceptedCountries = new HashSet<>();
 		acceptedCountries.add(CountryCode.BR);
 
-		BigDecimal taxAmount = new BigDecimal(5);
-
-		String comunicationUrl = "http://localhost:8081/api/fakeproviders/subacquirerc";
-		String providerClassIdentification = "SUBACQUIRERC";
-
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("SubAcquirerC", taxAmount, PaymentMethodProviderType.SUB_ACQUIRER, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
-		paymentMethodProviderRepository.save(paymentMethodProvider);
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for subacquire c", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
 	}
 
 	private void criaPaymentProviderGatewayD(List<Brand> allBrands) {
@@ -214,13 +190,9 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		Set<CountryCode> acceptedCountries = new HashSet<>();
 		acceptedCountries.add(CountryCode.BR);
 
-		BigDecimal taxAmount = new BigDecimal(1);
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for gateway d", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
 
-		String comunicationUrl = "http://localhost:8081/api/fakeproviders/gatewayd";
-		String providerClassIdentification = "GATEWAYD";
-
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("GatewayD", taxAmount, PaymentMethodProviderType.GATEWAY, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
-		paymentMethodProviderRepository.save(paymentMethodProvider);
 	}
 
 	private void criaPaymentProviderGatewayE(List<Brand> allBrands) {
@@ -230,18 +202,24 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 		Set<CountryCode> acceptedCountries = new HashSet<>();
 		acceptedCountries.add(CountryCode.BR);
 
-		BigDecimal taxAmount = new BigDecimal(3);
-
-		String comunicationUrl = "http://localhost:8081/api/fakeproviders/gatewaye";
-		String providerClassIdentification = "GATEWAYE";
-
-		PaymentMethodProvider paymentMethodProvider = new PaymentMethodProvider("GatewayE", taxAmount, PaymentMethodProviderType.GATEWAY, acceptedBrands, acceptedCountries, comunicationUrl, providerClassIdentification);
-		paymentMethodProviderRepository.save(paymentMethodProvider);
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for gateway e", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
 	}
-
 
 	@Bean
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
+
+	@Bean(value = "persistProviderConfiguration")
+	@Transactional
+	public void persistProviderConfiguration() {
+		List<Brand> allBrands = allBrands();
+		criaPaymentProviderSubAcquierA(allBrands);
+		criaPaymentProviderSubAcquierB(allBrands);
+		criaPaymentProviderSubAcquierC(allBrands);
+		criaPaymentProviderGatewayD(allBrands);
+		criaPaymentProviderGatewayE(allBrands);
+	}
+
 }

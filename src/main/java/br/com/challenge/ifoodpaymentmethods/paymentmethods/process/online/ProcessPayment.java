@@ -1,9 +1,9 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online;
 
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.Payment;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.PaymentMethodProvider;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.PaymentRequest;
 
-public interface ProcessPayment extends ProcessPaymentIdentification {
+public interface ProcessPayment {
 
-    ProcessPaymentResponse proccess(Payment payment, PaymentMethodProvider paymentMethodProvider);
+    Payment process(PaymentRequest paymentRequest);
 }

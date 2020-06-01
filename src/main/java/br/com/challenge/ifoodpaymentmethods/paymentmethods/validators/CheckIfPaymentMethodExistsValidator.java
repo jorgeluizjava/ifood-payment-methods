@@ -1,7 +1,7 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.validators;
 
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.PaymentRequest;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.PaymentRequestForm;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -17,13 +17,13 @@ public class CheckIfPaymentMethodExistsValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> aClass) {
-        return PaymentRequest.class.isAssignableFrom(aClass);
+        return PaymentRequestForm.class.isAssignableFrom(aClass);
     }
 
     @Override
     public void validate(Object target, Errors errors) {
-        PaymentRequest paymentRequest = (PaymentRequest) target;
-        PaymentMethod paymentMethod = manager.find(PaymentMethod.class, paymentRequest.getPaymentMethodId());
+        PaymentRequestForm paymentRequestForm = (PaymentRequestForm) target;
+        PaymentMethod paymentMethod = manager.find(PaymentMethod.class, paymentRequestForm.getPaymentMethodId());
         if (paymentMethod == null) {
             errors.rejectValue("paymentMethodId", null, "paymentMethodId does not exists!");
         }

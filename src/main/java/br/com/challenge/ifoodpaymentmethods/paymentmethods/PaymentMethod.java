@@ -52,6 +52,10 @@ public class PaymentMethod {
         return paymentMethodType;
     }
 
+    public String getPaymentMethodTypeName() {
+        return paymentMethodType.name();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

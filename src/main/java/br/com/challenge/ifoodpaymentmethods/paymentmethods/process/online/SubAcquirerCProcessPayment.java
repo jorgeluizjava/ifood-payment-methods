@@ -1,44 +1,44 @@
 package br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online;
 
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.Payment;
-import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.PaymentMethodProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.PaymentRequest;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.PaymentStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 
-@Service
 public class SubAcquirerCProcessPayment implements ProcessPayment {
 
-    @Autowired
     private RestTemplate client;
 
-    @Override
-    public ProcessPaymentResponse proccess(Payment payment, PaymentMethodProvider paymentMethodProvider) {
-
-        Assert.notNull(payment, "payment is required");
-        Assert.notNull(paymentMethodProvider, "paymentMethodProvider is required");
-
-        SubAcquirerRequest subAcquirerRequest = new SubAcquirerRequest(payment);
-
-        try {
-
-            URI uri = new URI(paymentMethodProvider.getComunicationUrl());
-            ResponseEntity<SubAcquirerResponse> response = client.postForEntity(uri, subAcquirerRequest, SubAcquirerResponse.class);
-            SubAcquirerResponse subAcquirerResponse = response.getBody();
-
-            return new ProcessPaymentResponse(subAcquirerResponse.getStatus().equals("OK"));
-
-        } catch (Exception ex) {
-            throw new RuntimeException("Payment process for orderId: " + payment.getOrderId() + " has failed", ex);
-        }
+    public SubAcquirerCProcessPayment(RestTemplate client) {
+        Assert.notNull(client, "client is required");
+        this.client = client;
     }
 
     @Override
-    public String getType() {
-        return "SUBACQUIRERC";
+    public Payment process(PaymentRequest paymentRequest) {
+
+        Assert.notNull(paymentRequest, "paymentRequest is required");
+
+        SubAcquirerRequest subAcquirerRequest = new SubAcquirerRequest(paymentRequest);
+
+        try {
+
+            String comunicationUrl = "http://localhost:8081/api/fakeproviders/subacquirerc";
+            URI uri = new URI(comunicationUrl);
+            ResponseEntity<SubAcquirerResponse> response = client.postForEntity(uri, subAcquirerRequest, SubAcquirerResponse.class);
+            SubAcquirerResponse subAcquirerResponse = response.getBody();
+            ProcessPaymentResponse processPaymentResponse = new ProcessPaymentResponse(subAcquirerResponse.isAccepted("OK"));
+
+            PaymentStatus paymentStatus = (processPaymentResponse.isSuccessed() ? PaymentStatus.FINISHED : PaymentStatus.FAILED);
+
+            return new Payment(paymentRequest.getOrderId(), paymentRequest.getRestaurant(), paymentRequest.getUser(), paymentRequest.getPaymentMethod(), paymentStatus, paymentRequest.getAmount());
+
+        } catch (Exception ex) {
+            throw new RuntimeException("Payment process for orderId: " + paymentRequest.getOrderId() + " has failed", ex);
+        }
     }
 }
