@@ -29,14 +29,15 @@ public class ListRestaurantPaymentsController {
     @GetMapping("/api/restaurants/{id}/payment-methods")
     public List<PaymentMethodDTO> listPaymentsBy(@PathVariable("id") Long id) {
 
-        Restaurant restaurant = FindById.executa(id, restaurantRepository);
+        Restaurant restaurant = FindById.execute(id, restaurantRepository);
 
         User user = getUser2();
 
-        return restaurant.filterDesiredPaymentMethods(user, paymentMethodFraudsterVerifier)
-                                .stream()
-                                .map(PaymentMethodDTO::new)
-                                .collect(toList());
+        return user
+                .filterDesiredPaymentMethods(restaurant, paymentMethodFraudsterVerifier)
+                .stream()
+                .map(PaymentMethodDTO::new)
+                .collect(toList());
 
     }
 

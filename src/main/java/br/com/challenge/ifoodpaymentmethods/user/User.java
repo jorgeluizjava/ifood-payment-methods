@@ -1,6 +1,8 @@
 package br.com.challenge.ifoodpaymentmethods.user;
 
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
+import br.com.challenge.ifoodpaymentmethods.restaurant.Restaurant;
+import br.com.challenge.ifoodpaymentmethods.shared.fraudster.PaymentMethodFraudsterVerifier;
 import org.springframework.util.Assert;
 
 import javax.persistence.*;
@@ -10,9 +12,12 @@ import javax.validation.constraints.NotEmpty;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toSet;
 
 @Entity
-@Table(name = "usuario")
+@Table(name = "user")
 public class User {
 
     @Id
@@ -53,7 +58,19 @@ public class User {
         return name;
     }
 
-    public boolean accept(PaymentMethod paymentMethod) {
-        return desiredPaymentMethods.contains(paymentMethod);
+    public String getLogin() {
+        return login;
+    }
+
+    public Set<PaymentMethod> filterDesiredPaymentMethods(Restaurant restaurant, PaymentMethodFraudsterVerifier paymentMethodFraudsterVerifier) {
+
+        Assert.notNull(restaurant, "restaurant must not be null");
+        Assert.notNull(paymentMethodFraudsterVerifier, "PaymentMethodFraudsterVerifier must not be null");
+
+        return desiredPaymentMethods
+                    .stream()
+                    .filter(paymentMethod -> restaurant.accept(paymentMethod))
+                    .filter(paymentMethod -> paymentMethodFraudsterVerifier.verify(this, paymentMethod))
+                    .collect(toSet());
     }
 }

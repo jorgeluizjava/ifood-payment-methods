@@ -3,21 +3,25 @@ package br.com.challenge.ifoodpaymentmethods;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethod;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodRepository;
 import br.com.challenge.ifoodpaymentmethods.paymentmethods.PaymentMethodType;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.process.online.creditcard.Brand;
+import br.com.challenge.ifoodpaymentmethods.paymentmethods.providers.ProviderConfiguration;
 import br.com.challenge.ifoodpaymentmethods.restaurant.Restaurant;
 import br.com.challenge.ifoodpaymentmethods.restaurant.RestaurantRepository;
+import br.com.challenge.ifoodpaymentmethods.shared.CountryCode;
 import br.com.challenge.ifoodpaymentmethods.user.User;
 import br.com.challenge.ifoodpaymentmethods.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import java.util.*;
 
 @SpringBootApplication
 @EnableJpaRepositories(enableDefaultTransactions = false)
@@ -31,6 +35,9 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 	@Autowired
 	private UserRepository userRepository;
+
+	@PersistenceContext
+	private EntityManager manager;
 
 	public static void main(String[] args) {
 		SpringApplication.run(IfoodPaymentMethodsApplication.class, args);
@@ -129,6 +136,90 @@ public class IfoodPaymentMethodsApplication implements CommandLineRunner {
 
 		Restaurant restaurant = new Restaurant("PARIS 6", paymentMethods);
 		restaurantRepository.save(restaurant);
+	}
+
+	private List<Brand> allBrands() {
+		List<Brand> allBrands = new ArrayList<>();
+		allBrands.add(Brand.MASTERCARD);
+		allBrands.add(Brand.VISA);
+		allBrands.add(Brand.AMEX);
+		allBrands.add(Brand.DINERS);
+		allBrands.add(Brand.ELO);
+		allBrands.add(Brand.HIPERCARD);
+		return allBrands;
+	}
+
+	private void criaPaymentProviderSubAcquierA(List<Brand> allBrands) {
+		Set<Brand> acceptedBrands = new HashSet<>();
+		acceptedBrands.add(allBrands.get(3)); // Diners
+
+		Set<CountryCode> acceptedCountries = new HashSet<>();
+		acceptedCountries.add(CountryCode.MX);
+
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for subacquire a", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
+	}
+
+	private void criaPaymentProviderSubAcquierB(List<Brand> allBrands) {
+		Set<Brand> acceptedBrands = new HashSet<>();
+		acceptedBrands.add(allBrands.get(3)); // Diners
+
+		Set<CountryCode> acceptedCountries = new HashSet<>();
+		acceptedCountries.add(CountryCode.MX);
+
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for subacquire b", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
+	}
+
+	private void criaPaymentProviderSubAcquierC(List<Brand> allBrands) {
+		Set<Brand> acceptedBrands = new HashSet<>();
+		acceptedBrands.addAll(allBrands);
+
+		Set<CountryCode> acceptedCountries = new HashSet<>();
+		acceptedCountries.add(CountryCode.BR);
+
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for subacquire c", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
+	}
+
+	private void criaPaymentProviderGatewayD(List<Brand> allBrands) {
+		Set<Brand> acceptedBrands = new HashSet<>();
+		acceptedBrands.add(allBrands.get(0)); // VISA
+		acceptedBrands.add(allBrands.get(1)); // MASTER_CARD
+
+		Set<CountryCode> acceptedCountries = new HashSet<>();
+		acceptedCountries.add(CountryCode.BR);
+
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for gateway d", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
+
+	}
+
+	private void criaPaymentProviderGatewayE(List<Brand> allBrands) {
+		Set<Brand> acceptedBrands = new HashSet<>();
+		acceptedBrands.addAll(allBrands);
+
+		Set<CountryCode> acceptedCountries = new HashSet<>();
+		acceptedCountries.add(CountryCode.BR);
+
+		ProviderConfiguration providerConfiguration = new ProviderConfiguration("Configuration for gateway e", acceptedBrands, acceptedCountries);
+		manager.persist(providerConfiguration);
+	}
+
+	@Bean
+	public RestTemplate restTemplate() {
+		return new RestTemplate();
+	}
+
+	@Bean(value = "persistProviderConfiguration")
+	@Transactional
+	public void persistProviderConfiguration() {
+		List<Brand> allBrands = allBrands();
+		criaPaymentProviderSubAcquierA(allBrands);
+		criaPaymentProviderSubAcquierB(allBrands);
+		criaPaymentProviderSubAcquierC(allBrands);
+		criaPaymentProviderGatewayD(allBrands);
+		criaPaymentProviderGatewayE(allBrands);
 	}
 
 }
